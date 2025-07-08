@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Main",
+            "type": "rdbg",
+            "request": "launch",
+            "script": "${workspaceRoot}/main.rb",
+            "args": ["./input/sample.xlsx", "./output/"],
+            "askParameters": true
+        }
+    ]
+}
