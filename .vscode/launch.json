@@ -8,6 +8,14 @@
             "script": "${workspaceRoot}/main.rb",
             "args": ["./input/sample.xlsx", "./output/"],
             "askParameters": true
+        },
+        {
+            "name": "Debug Main V2",
+            "type": "rdbg",
+            "request": "launch",
+            "script": "${workspaceRoot}/main_v2.rb",
+            "args": ["./input/sample_v2.xlsx", "./output/"],
+            "askParameters": true
         }
     ]
 }

@@ -31,10 +31,11 @@ class DefinitionGenerator
 
   def generate_dat(input_file, output_dir)
     defs = get_definitions(input_file)
-    File.open("#{output_dir}/output_jis8.dat", 'wb') do |file|
+    file_name = get_name(input_file)
+    File.open("#{output_dir}/#{file_name}_jis8.dat", 'w:iso-2022-jp') do |file|
       defs.each do |record|
         # JIS8にエンコード
-        content = NKF.nkf('-s', record)
+        content = record.encode('ISO-2022-JP')
         file.puts content
       end
     end
@@ -42,8 +43,9 @@ class DefinitionGenerator
 
   def generate_ebcdic_dat(input_file, output_dir)
     defs = get_definitions(input_file)
-    tmp_file = "#{output_dir}/output_tmp.dat"
-    output_file = "#{output_dir}/output_ebcdic.dat"
+    file_name = get_name(input_file)
+    tmp_file = "#{output_dir}/#{file_name}_tmp.dat"
+    output_file = "#{output_dir}/#{file_name}_ebcdic.dat"
 
     File.open(tmp_file, 'w') do |file|
       defs.each do |record|
@@ -56,6 +58,10 @@ class DefinitionGenerator
 
     # 一時ファイル削除
     File.delete(tmp_file) if File.exist?(tmp_file)
+  end
+
+  def get_name(input_file)
+    File.basename(input_file, File.extname(input_file))
   end
 
   def get_definitions(input_file)

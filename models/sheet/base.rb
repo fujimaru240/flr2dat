@@ -37,4 +37,8 @@ class Base
 
     value.start_with?(SHEET_VARIABLE) ? value.sub(SHEET_VARIABLE, '') : value
   end
+
+  def sheet_name?(value)
+    value.to_s.start_with?(SHEET_VARIABLE)
+  end
 end
