@@ -3,6 +3,7 @@
 require './models/excel'
 require './models/sheet/v2/common'
 require './models/sheet/v2/generator/record_generator'
+require './models/sheet/v2/generator/ebcdic_converter'
 
 module V2
   module Generator
@@ -55,21 +56,33 @@ module V2
         end
       end
 
+      # 新しいoutput_ebcdic_fileメソッド
       def output_ebcdic_file(output_dir, file_name, records)
-        tmp_file = "#{output_dir}/tmp_#{file_name}"
         output_file = "#{output_dir}/#{file_name}"
 
-        File.open(tmp_file, 'w') do |file|
+        File.open(output_file, 'wb') do |file|
           records.each do |record|
-            file.puts record
+            begin
+              # UTF-8からASCIIに正規化
+              ascii_record = record.encode('ASCII', 'UTF-8', 
+                                        :invalid => :replace, 
+                                        :undef => :replace, 
+                                        :replace => '?')
+              
+              # ASCIIからEBCDIC(IBM037)に変換
+              ebcdic_data = EbcdicConverter.ascii_to_ebcdic(ascii_record)
+              
+              file.write(ebcdic_data)
+              file.write(EbcdicConverter.ebcdic_newline)
+              
+            rescue => e
+              puts "EBCDIC変換エラー: #{e.message}"
+              puts "問題レコード: #{record[0..50]}..."
+            end
           end
         end
-
-        # iconvでEBCDIC(IBM037)に変換
-        system("iconv -f UTF-8 -t IBM037 #{tmp_file} > #{output_file}")
-
-        # 一時ファイル削除
-        File.delete(tmp_file) if File.exist?(tmp_file)
+        
+        puts "EBCDICファイル出力完了: #{output_file}"
       end
     end
   end
